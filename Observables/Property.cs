@@ -1,10 +1,14 @@
 ﻿namespace Keystone.Observables;
 
-public interface IReadOnlyProperty<T>
+public interface IObservable
 {
-    T Value { get; }
     event Action? Changing;
     event Action? Changed;
+}
+
+public interface IReadOnlyProperty<T> : IObservable
+{
+    T Value { get; }
 }
 
 public sealed class Property<T>(T initial) : IReadOnlyProperty<T>
@@ -34,16 +38,15 @@ public sealed class Property<T>(T initial) : IReadOnlyProperty<T>
         Changed?.Invoke();
     }
 
-    public void Bind<S>(IReadOnlyProperty<S> source, Func<S, T> transform)
+    public void Bind(Func<T> compute, params IObservable[] sources)
     {
         Unbind();
-        void handler() => Set(transform(source.Value));
-        source.Changed += handler;
-        _unbind = () => source.Changed -= handler;
-        Set(transform(source.Value));
+        void handler() => Set(compute());
+        foreach (var source in sources) source.Changed += handler;
+        _unbind = () => { foreach (var source in sources) source.Changed -= handler; };
+        handler();
     }
-    public void Bind(IReadOnlyProperty<T> source) =>
-        Bind(source, value => value);
+
     public void Unbind()
     {
         _unbind?.Invoke();
