@@ -1,6 +1,6 @@
 ﻿namespace Keystone.Reactivity;
 
-public interface IReadOnlyProperty<T> : IObservable
+public interface IReadOnlyProperty<T> : IWatchable
 {
     T Value { get; }
 }
@@ -10,6 +10,10 @@ public interface IProperty<T> : IReadOnlyProperty<T>, IBindable<T>
     new T Value { get; set; }
 }
 
+/// <summary>
+/// Encapsulates a value and fires events on change.
+/// </summary>
+/// <typeparam name="T">Type of the encapsulated value.</typeparam>
 public sealed class Property<T> : IProperty<T>
 {
     private T _value;
@@ -37,9 +41,9 @@ public sealed class Property<T> : IProperty<T>
     /// <summary>
     /// Constructs a Property that's already bound.
     /// </summary>
-    /// <param name="compute">Transform function to retrieve the value.</param>
-    /// <param name="sources">Sources to subscribe to for the update events.</param>
-    public Property(Func<T> compute, params IObservable[] sources)
+    /// <param name="compute">Function that computes the value.</param>
+    /// <param name="sources">Sources for the update events.</param>
+    public Property(Func<T> compute, params IWatchable[] sources)
     {
         // _value is set by Bind, default! is used to silence the compiler.
         _value = default!;
@@ -54,7 +58,12 @@ public sealed class Property<T> : IProperty<T>
         Changed?.Invoke();
     }
 
-    public void Bind(Func<T> compute, params IObservable[] sources)
+    /// <summary>
+    /// Bind this Property so that it updates automatically.
+    /// </summary>
+    /// <param name="compute">Function that computes the value.</param>
+    /// <param name="sources">Sources for the update events.</param>
+    public void Bind(Func<T> compute, params IWatchable[] sources)
     {
         Unbind();
         void handler() => Set(compute());
@@ -63,6 +72,9 @@ public sealed class Property<T> : IProperty<T>
         handler();
     }
 
+    /// <summary>
+    /// Unbind this Property from the current binding.
+    /// </summary>
     public void Unbind()
     {
         _unbind?.Invoke();

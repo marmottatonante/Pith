@@ -2,6 +2,6 @@
 
 public interface IBindable<T>
 {
-    void Bind(Func<T> compute, params IObservable[] sources);
+    void Bind(Func<T> compute, params IWatchable[] sources);
     void Unbind();
 }
