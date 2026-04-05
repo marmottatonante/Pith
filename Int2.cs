@@ -1,4 +1,4 @@
-namespace Keystone.Geometry;
+namespace Keystone;
 
 public readonly record struct Int2(int X, int Y)
 {

@@ -1,4 +1,4 @@
-﻿namespace Keystone.Reactivity;
+﻿namespace Keystone;
 
 public interface IReadOnlyProperty<T> : IWatchable
 {

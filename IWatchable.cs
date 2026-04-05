@@ -1,4 +1,4 @@
-﻿namespace Keystone.Reactivity;
+﻿namespace Keystone;
 
 /// <summary>
 /// Represents an object capable of being watched for changes.

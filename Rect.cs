@@ -1,4 +1,4 @@
-namespace Keystone.Geometry;
+namespace Keystone;
 
 public readonly record struct Rect(Int2 Position, Int2 Size)
 {
